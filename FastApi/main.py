@@ -1,238 +1,110 @@
-from fastapi import FastAPI,UploadFile ,File, HTTPException, status
-import uvicorn
-import os
-from langchain.prompts import PromptTemplate
-from langchain.chains.question_answering import load_qa_chain
-from langchain_community.document_loaders import PyPDFDirectoryLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_google_genai import ChatGoogleGenerativeAI
-import google.generativeai as genai
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+# import sys
+# sys.path.append('D:/Vivek_Roushan/Sales_Agent/Code')
+from .Code.Import_Libraries_and_Set_Up_Your_Environment import *
 
-
-
-# Load environment variables for authentication
-load_dotenv()
-os.getenv("GOOGLE_API_KEY")
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-
-
-# Define the FastAPI app
-app = FastAPI(title="Upload the room document")
 
 
 
 
-# Declare vector_index globally
-vector_index = None
+# Define the FastAPI app
+app = FastAPI()
 
+pdfs_directory = "uploads"
+os.makedirs(pdfs_directory, exist_ok=True)
+print("Directory 'uploads' created successfully")
+uploaded_files = []
 
-
-# Endpoint for uploading PDF files
-@app.post("/uploadpdf/")
-async def upload_pdf(pdf_name: str, files: list[UploadFile] = File(...) ):
+# Endpoint for uploading text files
+@app.post("/upload/")
+async def upload_file(files: list[UploadFile] = File(...) ):
     """
-    This endpoint allows users to upload PDF files.
+    This endpoint allows users to upload text files.
 
     Args:
-        pdf_name (str): Name of the PDF file to be uploaded.
-        files (list[UploadFile]): List of uploaded files.
+        file (UploadFile): The uploaded file.
 
     Returns:
         dict: Message indicating the success or failure of the upload.
     """
 
+    # pdfs_directory = "uploads"
+    # os.makedirs(pdfs_directory, exist_ok=True)
+    # print("Directory 'pdfs' created successfully")
+    # uploaded_files = []
 
-
-    # Save the uploaded PDF file
-    # Create the 'pdfs' directory if it doesn't exist
-    pdfs_directory = "pdfs"
-    os.makedirs(pdfs_directory, exist_ok=True)
-    print("Directory 'pdfs' created successfully")
-    uploaded_files = []
     for file in files:
-        file_ext = file.filename.split(".").pop()
-        
-        # Check if the file is a PDF
-        # if file_ext.lower() != "pdf":
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST , detail="Only PDF files are allowed.")
+        # file_name = file.filename
+        # file_path = f"{pdfs_directory}/{file_name}"
+        file_path = os.path.join(pdfs_directory, file.filename)
+        with open(file_path, "wb") as f:
+            content = await file.read()
+            f.write(content)
+        uploaded_files.append(file_path)
+    
+    
+    # try:
+    #     knowledge_base = process_and_create_knowledge_base()
+    #     if knowledge_base:
+    #         return {"message": "Knowledge base created successfully."}
+    #     else:
+    #         return {"error": "Failed to create knowledge base."}
+    # except Exception as e:
+    #     return {"error": str(e)}
 
-        file_name = file.filename
-        file_path = f"{pdfs_directory}/{file_name}"
-        
-        
-        try:  
-          # Save the uploaded file
-          with open(file_path,"wb") as f:
-              content = await file.read()
-              f.write(content)
-          uploaded_files.append(file_path)
-        except Exception as e:
-          raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error occured while  saving file: {e}"
-          )
+def process_and_create_knowledge_base():
+    """
+    This function processes the uploaded files, splits the text into chunks, creates embeddings,
+    and saves them to a Chroma vector database.
+    Args:
+        file_paths (list[str]): Paths to the uploaded files.
+    Returns:
+        RetrievalQA: The knowledge base object.
+    """
+    
+
+    # try:
+    # Load the text from the uploaded file
+    # loader = TextLoader(file_path)
+    loader = PyPDFDirectoryLoader("uploads")
 
 
-    try:
-      # Load and split the uploaded PDF using PyPDFDirectoryLoader
-      loader = PyPDFDirectoryLoader("pdfs")
-      data = loader.load_and_split()
-    except Exception as e:
-      raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=f"Error occured while loading PDF: {e}"
-      )
+    # documents = loader.load()
+    data = loader.load_and_split()
 
-
-    # Combine page content into a single context string
     context = "\n".join(str(p.page_content) for p in data)
 
-    # Split the Extracted Data into Text Chunks
-    # Split the context into text chunks using RecursiveCharacterTextSplitter
+    # Split the text into chunks
+    # text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=200)
-    context = "\n\n".join(str(p.page_content) for p in data)
+
+
+    # splits = text_splitter.split_documents(documents)
     texts = text_splitter.split_text(context)
-    # texts[0]
 
+    # Create embeddings for the text chunks
+    embeddings = OpenAIEmbeddings()
 
-    # Save to Chroma Vector Database
-    # Process and save the text chunks to Chroma Vector Database
-    try:
-      success_message = process_and_save_to_chroma(pdfs_directory, pdf_name)
-      return {"message": success_message}
-    except Exception as e:
-      raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-          detail=f"Error occured while processing and saving text: {e}"
-      )
+    # Create the Chroma vector index and save the embeddings
+    # vector_index = Chroma.from_documents(splits, embedding=embeddings).as_retriever()
+    vector_index = Chroma.from_texts(texts, embeddings)
+    retriever = vector_index.as_retriever()
 
-
-
-
-
-def process_and_save_to_chroma(pdf_path, pdf_name):
-    
-    """
-    This function converts the text from a PDF into embeddings and saves them to Chroma.
-
-    Args:
-        pdf_path (str): Path to the PDF file.
-        pdf_name (str): Name of the PDF file.
-
-    Returns:
-        str: Message indicating the success of the conversion and saving.
-    """
-
-
-
-    global vector_index  # Declare vector_index as a global variable
-
-
-    if not os.path.exists(pdf_path):
-      return f"Error: PDF file '{pdf_name}' not found at '{pdf_path}'"
-
-
-    
-    # Extract the text from the PDF's
-    # Load and split the PDF text
-    try:
-      loader = PyPDFDirectoryLoader(pdf_path)
-      data = loader.load_and_split()
-
-      context = "\n".join(str(p.page_content) for p in data)
-
-      # Split the Extracted Data into Text Chunks
-      text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=200)
-      context = "\n\n".join(str(p.page_content) for p in data)
-      texts = text_splitter.split_text(context)
-
-
-      # Create embeddings for the text chunks
-      embeddings = create_embeddings()
-
-
-      # Chroma vector index and save the embeddings
-      vector_index = Chroma.from_texts(texts, embeddings).as_retriever()
-      return f"Document '{pdf_name}' successfully converted to embeddings and saved to Chroma DB."
-    except Exception as e:
-      return f"Error occured while processing PDF '{pdf_name}': {e}"
-
-
-
-def create_embeddings():
-    embeddings = GoogleGenerativeAIEmbeddings(model = "models/embedding-001")
-    return embeddings
-
-
-
-
-
-@app.post("/qa/")
-async def perform_qa(pdf_name: str, question: str):
-    # Search Chroma Vector Database for relevant segments
-    try:
-      relevant_segments = search_chroma_db(question)
-      
-      answer = get_answer_using_palm2(relevant_segments, question)
-      
-      return {"answer": answer}
-    except Exception as e:
-      return {"error": f"Error answering question or answer not found: {e}"}
-
-
-
-def search_chroma_db(question):
-    # Add code to query Chroma Vector Database based on user question
-    docs = vector_index.get_relevant_documents(question)
-    # return relevant_segments
-    return docs
-
-
-
-def get_answer_using_palm2(relevant_segments, question):
-    prompt_template = """
-      Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
-      provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
-      Context:\n {context}?\n
-      Question: \n{question}\n
-
-      Answer:
-    """
-
-
-    try:
-      if not relevant_segments:
-        return "Answer not available in the context."
-
-
-
-      prompt = PromptTemplate(template = prompt_template, input_variables = ["context", "question"])
-      model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
-      chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
-      response = chain({"input_documents":relevant_segments, "question": question}, return_only_outputs=True)
-      return response
-    except Exception as e:
-       return f"An error occurred while retrieving answer: {str(e)}"
-
+    # Set up the knowledge base
+    # llm = ChatOpenAI(temperature=0.9)
+    # knowledge_base = RetrievalQA.from_chain_type(llm=llm, chain_type="stuff", retriever=vector_index)
+    # llm = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+    knowledge_base = RetrievalQA.from_chain_type(
+        llm=llm, chain_type="stuff", retriever=retriever
+    )
+    return knowledge_base
+    # except Exception as e:
+    #     raise f"Error occurred while creating knowledge base from : {str(e)}"
+         
 
 
 
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app",host="127.0.0.1",reload=True)
-
-
-
-
-
-
-
-
-
-
-
+    import uvicorn
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
