@@ -111,12 +111,12 @@ conversation_stage_dict = {
 
 verbose = True
 llm = ChatOpenAI(
-    model="gpt-3.5-turbo-012",
+    model="gpt-3.5-turbo-0125",
     temperature=0.9,
     openai_api_key=os.getenv("OPENAI_API_KEY"),
 )
 
-llm = ChatOpenAI(temperature=0.9)
+# llm = ChatOpenAI(temperature=0.9)
 
 stage_analyzer_chain = StageAnalyzerChain.from_llm(llm, verbose=verbose)
 

@@ -1,0 +1,32 @@
+# Dummy dataset with sample hotel data
+hotels = [
+    {
+        "name": "Grand Hotel",
+        "location": "New York City, USA",
+        "room_types": ["Single", "Double", "Suite"],
+        "amenities": ["Free WiFi", "Pool", "Fitness Center", "Restaurant"],
+        "facilities": ["Air Conditioning", "Coolers", "Furnishings", "Showers"],
+        "nearby": ["Central Park", "Times Square", "Broadway Theaters"],
+        "environment": "Clean and safe environment",
+        "check_in": "3:00 PM",
+        "check_out": "11:00 AM",
+        "premium_facilities": ["Spa", "Rooftop Bar"],
+        "breakfast": "Complimentary breakfast buffet",
+        "food_options": ["Room Service", "On-site Restaurants"]
+    },
+    {
+        "name": "Beach Resort",
+        "location": "Cancun, Mexico",
+        "room_types": ["Standard", "Ocean View", "Villa"],
+        "amenities": ["Private Beach", "Outdoor Pool", "Spa"],
+        "facilities": ["Air Conditioning", "Furnishings", "Showers", "Dining Halls"],
+        "nearby": ["Beaches", "Golf Courses", "Shopping Centers"],
+        "environment": "Safe and secure beachfront resort",
+        "check_in": "2:00 PM",
+        "check_out": "12:00 PM",
+        "premium_facilities": ["Beachfront Cabanas", "Water Sports"],
+        "breakfast": "Breakfast included in room rate",
+        "food_options": ["All-inclusive Dining", "Beachside Restaurants"]
+    },
+    # Add more hotel data as needed
+]

@@ -1,5 +1,6 @@
 from Import_Libraries_and_Set_Up_Your_Environment import *
 from Knowledge_Base import setup_knowledge_base
+# from main import process_and_create_knowledge_base
 
 
 
@@ -15,7 +16,8 @@ def get_tools():
     # see here: https://langchain-langchain.vercel.app/docs/use_cases/agents/custom_agent_with_plugin_retrieval#tool-retriever
 
     # we only use one tool for now, but this is highly extensible!
-    knowledge_base = setup_knowledge_base()
+    # knowledge_base = process_and_create_knowledge_base()
+    knowledge_base = setup_knowledge_base
     tools = [
         Tool(
             name="RoomSearch",
