@@ -3,10 +3,16 @@ from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from models.user import User
 from utils.db import get_db
+
+from passlib.context import CryptContext
+from jose import jwt, JWTError
+from .db import get_db
+
+
+
 
 
 
@@ -83,16 +89,9 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 
 
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from jose import jwt
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from .db import get_db
-from sqlalchemy.orm import Session
-from models.user import User
 
-SECRET_KEY = "your_secret_key"
+
+SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -145,11 +144,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
-from .db import get_db
-from models.user import User
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
