@@ -1,8 +1,8 @@
 from langchain.chains import ConversationChain
 from langchain.memory import ConversationBufferMemory
 from langchain.llms import OpenAI
-from ..models.conversation import Conversation
-from ..utils.db import get_db
+from models.conversation import Conversation
+from utils.db import get_db
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
