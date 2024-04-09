@@ -8,6 +8,12 @@ from utils.security import get_current_user
 from utils.agent import get_agent_response
 from models.user import User
 
+# from ..utils.agent import handle_user_query
+
+
+
+
+
 router = APIRouter(
     prefix="/conversations",
     tags=["conversations"],
@@ -49,16 +55,7 @@ def get_conversation_history(
 
 
 
-# from ..utils.agent import handle_user_query
-from utils.agent import get_agent_response
 
-
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from utils.db import get_db
-from utils.security import get_current_user
-from models.user import User
-from models.conversation import Conversation
 
 
 
