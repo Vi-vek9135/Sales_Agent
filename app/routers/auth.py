@@ -2,17 +2,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.models.user import User
-from app.schemas.user import UserCreate, UserResponse
-from app.utils.security import get_password_hash, verify_password, create_access_token
-from app.utils.db import get_db
+from models.user import User
+from schemas.user import UserCreate, UserResponse
+from utils.security import get_password_hash, verify_password, create_access_token
+from utils.db import get_db
 
 
 
-from ..models.user import User
-from ..utils.security import get_password_hash, verify_password, create_access_token
+from models.user import User
+from utils.security import get_password_hash, verify_password, create_access_token
 from sqlalchemy.orm import Session
-from ..utils.db import get_db
+from utils.db import get_db
 
 
 
@@ -57,53 +57,4 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from fastapi import APIRouter, Depends, HTTPException, status
-# from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-# from ..models.user import User
-# from ..utils.security import get_password_hash, verify_password, create_access_token
-# from sqlalchemy.orm import Session
-# from ..utils.db import get_db
-
-# router = APIRouter()
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
-
-# @router.post("/signup")
-# def signup(user: User, db: Session = Depends(get_db)):
-#     db_user = db.query(User).filter(User.email == user.email).first()
-#     if db_user:
-#         raise HTTPException(status_code=400, detail="Email already registered")
-#     user.password = get_password_hash(user.password)
-#     db.add(user)
-#     db.commit()
-#     db.refresh(user)
-#     return user
-
-# @router.post("/login")
-# def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-#     user = db.query(User).filter(User.email == form_data.username).first()
-#     if not user or not verify_password(form_data.password, user.password):
-#         raise HTTPException(
-#             status_code=status.HTTP_401_UNAUTHORIZED,
-#             detail="Incorrect email or password",
-#             headers={"WWW-Authenticate": "Bearer"},
-#         )
-#     access_token = create_access_token(data={"sub": user.email})
-#     return {"access_token": access_token, "token_type": "bearer"}
 
