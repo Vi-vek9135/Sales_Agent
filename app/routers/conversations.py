@@ -1,11 +1,12 @@
 # app/routers/conversations.py
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from app.models.conversation import Conversation
-from app.schemas.conversation import ConversationCreate, ConversationResponse
-from app.utils.db import get_db
-from app.utils.security import get_current_user
-from app.utils.agent import get_agent_response
+from models.conversation import Conversation
+from schemas.conversation import ConversationCreate, ConversationResponse
+from utils.db import get_db
+from utils.security import get_current_user
+from utils.agent import get_agent_response
+from models.user import User
 
 router = APIRouter(
     prefix="/conversations",
@@ -48,15 +49,16 @@ def get_conversation_history(
 
 
 
-from ..utils.agent import handle_user_query
+# from ..utils.agent import handle_user_query
+from utils.agent import get_agent_response
 
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..utils.db import get_db
-from ..utils.security import get_current_user
-from ..models.user import User
-from ..models.conversation import Conversation
+from utils.db import get_db
+from utils.security import get_current_user
+from models.user import User
+from models.conversation import Conversation
 
 
 
@@ -66,7 +68,7 @@ router = APIRouter()
 @router.post("/")
 def chat_with_agent(query: str, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     # Handle the user's query using the agent
-    agent_response = handle_user_query(query)
+    agent_response = get_agent_response(query)
 
     # Save the conversation to the database
     conversation = Conversation(user_id=user.id, query=query, agent_response=agent_response)
