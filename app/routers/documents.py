@@ -1,11 +1,11 @@
 # app/routers/documents.py
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
-from app.models.document import Document
-from app.schemas.document import DocumentCreate, DocumentResponse
-from app.utils.db import get_db
-from app.models.user import User
-from app.utils.security import get_current_user
+from models.document import Document
+from schemas.document import DocumentCreate, DocumentResponse
+from utils.db import get_db
+from models.user import User
+from utils.security import get_current_user
 
 router = APIRouter(
     prefix="/documents",
@@ -42,11 +42,11 @@ def upload_document(
 
 from fastapi import APIRouter, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
-from app.models.document import Document
-from app.models.user import User  # Import the User model
-from app.schemas.document import DocumentCreate, DocumentResponse
-from app.utils.db import get_db
-from app.utils.security import get_current_user
+from models.document import Document
+from models.user import User  # Import the User model
+from schemas.document import DocumentCreate, DocumentResponse
+from utils.db import get_db
+from utils.security import get_current_user
 
 router = APIRouter(
     prefix="/documents",
@@ -90,22 +90,3 @@ def list_documents(db: Session = Depends(get_db), current_user: User = Depends(g
 
 
 
-
-# from fastapi import APIRouter, Depends, File, UploadFile
-# from ..models.document import Document
-# from ..utils.db import get_db
-# from sqlalchemy.orm import Session
-# from ..utils.security import get_current_user
-
-# router = APIRouter()
-
-# @router.post("/upload")
-# def upload_document(file: UploadFile = File(...), db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-#     # Save the file to storage (e.g., S3, local file system)
-#     # Create a new Document instance and save it to the database
-#     pass
-
-# @router.get("/")
-# def list_documents(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-#     # Retrieve the documents for the current user
-#     pass
