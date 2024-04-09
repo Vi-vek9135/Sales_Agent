@@ -5,10 +5,26 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-from app.models.user import User
-from app.utils.db import get_db
+from models.user import User
+from utils.db import get_db
 
-SECRET_KEY = "your_secret_key"
+
+
+
+# ACCESS_TOKEN_EXPIRE_MINUTES = 30  # 30 minutes
+# REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7 # 7 days
+# ALGORITHM = "HS256"
+# JWT_SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"   # should be kept secret
+# # 6937121d28ceb956bc66465684dc42d4f5ac1d717e3badf52cbfcab3894213dc
+# JWT_REFRESH_SECRET_KEY = "13ugfdfgh@#$%^@&jkl45678902"
+
+
+
+
+# SECRET_KEY = "your_secret_key"
+
+
+SECRET_KEY = "narscbjim@$@&^@&%^&RFghgjvbdsha"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -74,7 +90,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from .db import get_db
 from sqlalchemy.orm import Session
-from ..models.user import User
+from models.user import User
 
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
@@ -133,7 +149,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from .db import get_db
-from ..models.user import User
+from models.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
